@@ -63,7 +63,7 @@ Built two custom scheduled analytics rules to operationalize the data:
 
 **Brute-Force KQL:**
 ```kusto
-let threshold = 10;
+let threshold = 5;
 Syslog
 | where Facility == "authpriv"
 | where SyslogMessage contains "Failed password"
