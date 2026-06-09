@@ -1,0 +1,18 @@
+Syslog
+| where TimeGenerated > ago(24h)
+| where SyslogMessage contains "Failed"
+| extend AttackerIP = extract("from\\s+(\\d+\\.\\d+\\.\\d+\\.\\d+)", 1, SyslogMessage)
+| where isnotempty(AttackerIP)
+| order by AttackerIP, TimeGenerated asc
+| extend TimeDiff = datetime_diff('minute', TimeGenerated, prev(TimeGenerated))
+| extend NewSession = case(AttackerIP != prev(AttackerIP), 1, TimeDiff > 30, 1, 0)
+| extend SessionID = row_cumsum(NewSession)
+| summarize
+SessionDuration = datetime_diff('minute', max(TimeGenerated), min(TimeGenerated)),
+Attempts = count(),
+AvgGap = avg(TimeDiff)
+by AttackerIP, SessionID
+| summarize
+MedianSessionDuration = percentile(SessionDuration, 50),
+AvgAttemptsPerSession = avg(Attempts),
+MaxAttemptsInOneSession = max(Attempts)
