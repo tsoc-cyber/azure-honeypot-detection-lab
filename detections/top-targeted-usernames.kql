@@ -1,0 +1,9 @@
+Syslog
+| where TimeGenerated > ago(24h)
+| where SyslogMessage contains "Failed"
+| extend AttackerIP = extract("from\\s+(\\d+\\.\\d+\\.\\d+\\.\\d+)", 1, SyslogMessage)
+| extend Username = extract("for\\s+(\\S+)\\s+from", 1, SyslogMessage)
+| where AttackerIP != "x.x.x.x"  // home IP due to testing
+| where isnotempty(Username)
+| summarize Attempts = count() by Username
+| top 10 by Attempts desc
