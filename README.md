@@ -58,7 +58,7 @@ Built two custom scheduled analytics rules to operationalize the data:
 
 | Rule | Logic | Severity |
 |------|-------|----------|
-| **Brute-Force Detection** | ≥ 10 failed SSH attempts from a single IP in 5 minutes | Medium |
+| **Brute-Force Detection** | ≥ 5 failed SSH attempts from a single IP in 5 minutes | Medium |
 | **Successful Auth Anomaly** | Any `Accepted publickey` event (post-hardening baseline) | High |
 
 **Brute-Force KQL:**
