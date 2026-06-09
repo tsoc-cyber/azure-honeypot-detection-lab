@@ -1,0 +1,12 @@
+// Sentinel Analytics Rule: Brute-Force Detection
+// Description: Triggers when a single IP fails SSH authentication 10+ times in 5 minutes.
+// MITRE ATT&CK: T1110 - Brute Force
+
+let threshold = 5;
+Syslog
+| where Facility == "authpriv"
+| where SyslogMessage contains "Failed password"
+| extend AttackerIP = extract(@"from\s+(\d+\.\d+\.\d+\.\d+)", 1, SyslogMessage)
+| summarize Attempts = count() by AttackerIP, Computer, bin(TimeGenerated, 5m)
+| where Attempts >= threshold
+| project AttackerIP, Attempts, Computer, TimeGenerated
